@@ -10,6 +10,8 @@ https://plot.ly/python/heatmaps/
 https://plot.ly/python/reference/#heatmap
 https://plot.ly/python/reference/#layout-images
 https://community.plot.ly/t/using-local-image-as-background-image/4381
+
+https://plot.ly/dash/dash-core-components/upload
 """
 import dash
 import dash_core_components as dcc
@@ -20,7 +22,7 @@ import plotly.graph_objs as go
 import base64
 import os
 import glob
-
+import io
 
 
 # ~~~~ FUNCTIONS ~~~~~ #
@@ -70,7 +72,19 @@ def _layout():
     )
     return(layout)
 
+def parse_contents(contents, filename, date):
+    """
+    Parses the file uploaded by the user
+    """
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    # decoded_io = io.StringIO(decoded.decode('utf-8'))
+    encoded_image = base64.b64encode(open(filename, 'rb').read())
 
+    return(html.Div([
+            html.Img(id='image1', style = {"max-width": "100%", "max-height": "100%"}, src='data:image/png;base64,{}'.format(encoded_image)),
+            'heres your file:\n\n{0}\n\n{1}\n\n{2}\n\n{3}'.format(filename, date, content_type, content_string)
+        ]))
 
 # ~~~~~ SETUP ~~~~~ #
 image_directory = 'input'
@@ -116,6 +130,36 @@ app.layout = html.Div(children=[
     #                                                 layout = _layout() ) )
     # ])
 
+    ]),
+
+
+    html.Div(id = 'row2', className = 'row', children=[
+    html.Div(id = 'row2-col1', className = 'row', children=[
+    html.Div(id = 'image-upload-div', children=[
+    html.H2(children='Upload an image:'),
+    dcc.Upload(
+        id='upload-image',
+        children=html.Div([
+            'Drag and Drop or ',
+            html.A('Select Files')
+        ]),
+        style={
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+        # Allow multiple files to be uploaded
+        multiple=True
+    ),
+    html.Div(id='output-image-upload'),
+
+    ])
+    ], style = {'float': 'left', 'width': "48%"})
     ])
 
 ])
@@ -152,6 +196,17 @@ def update_image2(input_value):
     else:
         encoded_image = base64.b64encode(open(input_value, 'rb').read())
         return(html.Img(id='image2', style = {"max-width": "100%", "max-height": "100%"}, src='data:image/png;base64,{}'.format(encoded_image)))
+
+@app.callback(Output('output-image-upload', 'children'),
+              [Input('upload-image', 'contents'),
+               Input('upload-image', 'filename'),
+               Input('upload-image', 'last_modified')])
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    if list_of_contents is not None:
+        children = [
+            parse_contents(c, n, d) for c, n, d in
+            zip(list_of_contents, list_of_names, list_of_dates)]
+        return(children)
 
 
 if __name__ == '__main__':
