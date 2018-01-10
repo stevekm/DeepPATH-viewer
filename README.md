@@ -4,6 +4,12 @@ App to view the results from [DeepPATH](https://github.com/ncoudray/DeepPATH) hi
 
 # Installation
 
+Clone this repository
+
+```
+git clone https://github.com/stevekm/DeepPATH-viewer.git
+```
+
 Install the Python packages in a virtual environment
 
 ```
