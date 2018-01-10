@@ -21,3 +21,14 @@ Activate the virtual environment
 ```
 . activate
 ```
+
+# Run
+
+Start the app
+
+```
+python app.py
+#  * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+```
+
+Open a web browser and navigate to the IP address shown (e.g. `http://127.0.0.1:8050/`)
