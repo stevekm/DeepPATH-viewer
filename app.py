@@ -77,14 +77,24 @@ def parse_contents(contents, filename, date):
     Parses the file uploaded by the user
     """
     content_type, content_string = contents.split(',')
+
+    default_message = 'heres your file:\n\n{0}\n\n{1}\n\n{2}\n\n{3}'.format(filename, date, content_type, content_string)
+
     decoded = base64.b64decode(content_string)
     # decoded_io = io.StringIO(decoded.decode('utf-8'))
-    encoded_image = base64.b64encode(open(filename, 'rb').read())
 
-    return(html.Div([
-            html.Img(id='image1', style = {"max-width": "100%", "max-height": "100%"}, src='data:image/png;base64,{}'.format(encoded_image)),
-            'heres your file:\n\n{0}\n\n{1}\n\n{2}\n\n{3}'.format(filename, date, content_type, content_string)
-        ]))
+    try:
+        encoded_image = base64.b64encode(open(filename, 'rb').read())
+
+        return(html.Div([
+                html.Img(id='image1', style = {"max-width": "100%", "max-height": "100%"}, src='data:image/png;base64,{}'.format(encoded_image)),
+                default_message
+            ]))
+    except:
+        return(html.Div([
+                "The image parsing broke !!",
+                default_message
+            ]))
 
 # ~~~~~ SETUP ~~~~~ #
 image_directory = 'input'
